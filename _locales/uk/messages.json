@@ -1,0 +1,48 @@
+{
+  "appName": {
+    "message": "Core UI Palette Генератор"
+  },
+  "appDesc": {
+    "message": "Генерація UI-палітри з базового кольору"
+  },
+  "tooltipPickup": {
+    "message": "Колір"
+  },
+  "tooltipPaste": {
+    "message": "Вставити"
+  },
+  "tooltipToggle": {
+    "message": "Змінити"
+  },
+  "tooltipCopy": {
+    "message": "Копія"
+  },
+  "tooltipCopyCSS": {
+    "message": "Копія CSS"
+  },
+  "tooltipCopyJSON": {
+    "message": "Копія JSON"
+  },
+  "toastCopied": {
+    "message": "Скопійовано: $COLOR$",
+    "placeholders": {
+      "color": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastPasted": {
+    "message": "Вставлено: $COLOR$",
+    "placeholders": {
+      "color": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastCSS": {
+    "message": "CSS скопійовано!"
+  },
+  "toastJSON": {
+    "message": "JSON скопійовано!"
+  }
+}

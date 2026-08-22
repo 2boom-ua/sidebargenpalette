@@ -1,0 +1,48 @@
+{
+  "appName": {
+    "message": "Core UI Palette Generator"
+  },
+  "appDesc": {
+    "message": "Generate UI palette from base color"
+  },
+  "tooltipPickup": {
+    "message": "Pickup"
+  },
+  "tooltipPaste": {
+    "message": "Paste"
+  },
+  "tooltipToggle": {
+    "message": "Toggle"
+  },
+  "tooltipCopy": {
+    "message": "Copy"
+  },
+  "tooltipCopyCSS": {
+    "message": "Copy CSS"
+  },
+  "tooltipCopyJSON": {
+    "message": "Copy JSON"
+  },
+  "toastCopied": {
+    "message": "Copied: $COLOR$",
+    "placeholders": {
+      "color": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastPasted": {
+    "message": "Pasted: $COLOR$",
+    "placeholders": {
+      "color": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastCSS": {
+    "message": "CSS copied!"
+  },
+  "toastJSON": {
+    "message": "JSON copied!"
+  }
+}
