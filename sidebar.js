@@ -24,55 +24,72 @@ function mixColors(hex1, hex2, ratio) {
     return rgbToHex(r, g, b);
 }
 
-// Helper: convert RGB to OKLCH
+// Helper: convert RGB to OKLCH with correct matrices
 function rgbToOklch(r, g, b) {
-    let l = r / 255, a = g / 255, _b = b / 255;
-    l = l > 0.04045 ? Math.pow((l + 0.055) / 1.055, 2.4) : l / 12.92;
-    a = a > 0.04045 ? Math.pow((a + 0.055) / 1.055, 2.4) : a / 12.92;
-    _b = _b > 0.04045 ? Math.pow((_b + 0.055) / 1.055, 2.4) : _b / 12.92;
+    // Convert sRGB to linear RGB
+    let lr = r / 255, lg = g / 255, lb = b / 255;
+    lr = lr > 0.04045 ? Math.pow((lr + 0.055) / 1.055, 2.4) : lr / 12.92;
+    lg = lg > 0.04045 ? Math.pow((lg + 0.055) / 1.055, 2.4) : lg / 12.92;
+    lb = lb > 0.04045 ? Math.pow((lb + 0.055) / 1.055, 2.4) : lb / 12.92;
 
-    const x = l * 0.4124564 + a * 0.3575761 + _b * 0.1804375;
-    const y = l * 0.2126729 + a * 0.7151522 + _b * 0.0721750;
-    const z = l * 0.0193339 + a * 0.1191920 + _b * 0.9503041;
+    // Linear RGB to XYZ
+    const x = lr * 0.4124564 + lg * 0.3575761 + lb * 0.1804375;
+    const y = lr * 0.2126729 + lg * 0.7151522 + lb * 0.0721750;
+    const z = lr * 0.0193339 + lg * 0.1191920 + lb * 0.9503041;
 
+    // Correct XYZ to LMS (OKLab)
     const lms = [
-        x * 0.4122214708 + y * 0.5363325363 + z * 0.0514459929,
-        x * 0.2119034982 + y * 0.6806995451 + z * 0.1073969566,
-        x * 0.0883024619 + y * 0.2817188376 + z * 0.6299787005
+        x * 0.8190224379967030 + y * 0.3619062600528904 - z * 0.1288737815209879,
+        x * 0.0329836539323885 + y * 0.9292868615863434 + z * 0.0361446663506424,
+        x * 0.0481771893596242 + y * 0.2642395317527308 + z * 0.6335478284694309
     ];
 
+    // Cube root
     const lms2 = lms.map(c => Math.cbrt(c));
+    
+    // LMS to OKLab
     const L = 0.2104542553 * lms2[0] + 0.7936177850 * lms2[1] - 0.0040720468 * lms2[2];
     const A = 1.9779984951 * lms2[0] - 2.4285922050 * lms2[1] + 0.4505937099 * lms2[2];
     const B = 0.0259040371 * lms2[0] + 0.7827717662 * lms2[1] - 0.8086757660 * lms2[2];
 
+    // OKLab to OKLCH
     const C = Math.sqrt(A * A + B * B);
-    const H = Math.atan2(B, A) * (180 / Math.PI);
-    return { l: L, c: C, h: H < 0 ? H + 360 : H };
+    let H = Math.atan2(B, A) * (180 / Math.PI);
+    if (H < 0) H += 360;
+
+    return { l: L, c: C, h: H };
 }
 
-// Helper: convert OKLCH to RGB
+// Helper: convert OKLCH to RGB with correct matrices
 function oklchToRgb(l, c, h) {
     const hRad = h * Math.PI / 180;
     const L = l;
     const A = c * Math.cos(hRad);
     const B = c * Math.sin(hRad);
 
+    // OKLab to LMS
     const lms = [
         L + 0.3963377774 * A + 0.2158037573 * B,
         L - 0.1055613458 * A - 0.0638541728 * B,
         L - 0.0894841775 * A - 1.2914855480 * B
     ];
 
-    const lms2 = lms.map(c => c * c * c);
-    const x = 1.2268798752 * lms2[0] - 0.5578149945 * lms2[1] + 0.2813910450 * lms2[2];
-    const y = -0.0405757622 * lms2[0] + 1.1122868030 * lms2[1] - 0.0717110585 * lms2[2];
-    const z = -0.0763729493 * lms2[0] - 0.3211777763 * lms2[1] + 1.4226686893 * lms2[2];
+    // Cube to linear LMS
+    const lmsL = lms[0] * lms[0] * lms[0];
+    const lmsM = lms[1] * lms[1] * lms[1];
+    const lmsS = lms[2] * lms[2] * lms[2];
 
-    let r = 3.2409699419 * x - 1.5373831776 * y - 0.4986107603 * z;
-    let g = -0.9692436363 * x + 1.8759675015 * y + 0.0415550574 * z;
-    let b = 0.0556300797 * x - 0.2039769589 * y + 1.0569715142 * z;
+    // Correct LMS to XYZ (inverse of XYZ→LMS)
+    const x = lmsL * 1.226879875245 - lmsM * 0.557814994460 + lmsS * 0.281391045666;
+    const y = lmsL * -0.040575745215 + lmsM * 1.112286803280 - lmsS * 0.071711058562;
+    const z = lmsL * -0.076372936675 - lmsM * 0.321246551595 + lmsS * 1.422568569568;
 
+    // XYZ to linear RGB
+    let r = x * 3.2409699419 - y * 1.5373831776 - z * 0.4986107603;
+    let g = x * -0.9692436363 + y * 1.8759675015 + z * 0.0415550574;
+    let b = x * 0.0556300797 - y * 0.2039769589 + z * 1.0569715142;
+
+    // Linear RGB to sRGB
     r = r > 0.0031308 ? 1.055 * Math.pow(r, 1 / 2.4) - 0.055 : 12.92 * r;
     g = g > 0.0031308 ? 1.055 * Math.pow(g, 1 / 2.4) - 0.055 : 12.92 * g;
     b = b > 0.0031308 ? 1.055 * Math.pow(b, 1 / 2.4) - 0.055 : 12.92 * b;
