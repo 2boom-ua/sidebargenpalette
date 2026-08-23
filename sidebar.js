@@ -1,4 +1,5 @@
-// Helper: convert hex to RGB
+// Core UI Palette Generator - Chrome/Edge Extension
+// Copyright 2boom, 2026
 function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -176,11 +177,11 @@ function generatePalette(baseHex, theme) {
         result.border = mixColors(baseHex, '#ffffff', 0.30);
     }
 
-    // Fixed theme colors (for export only)
+    // Fixed theme colors (for export and Example UI)
     result.themeLightBg = '#F7F7F7';
     result.themeLightSurface = '#EEEEEE';
     result.themeDarkBg = '#121212';
-    result.themeDarkSurface = '#1C1C1C';
+    result.themeDarkSurface = '#2A2A2A';
 
     return result;
 }
@@ -191,7 +192,6 @@ function generatePaletteWithSemantic(baseHex, theme) {
     if (!palette) return null;
     const semantic = generateSemanticColors(theme);
     
-    // Use unified theme color names for export
     if (theme === 'light') {
         palette.themeBg = palette.themeLightBg;
         palette.themeSurface = palette.themeLightSurface;
@@ -200,7 +200,6 @@ function generatePaletteWithSemantic(baseHex, theme) {
         palette.themeSurface = palette.themeDarkSurface;
     }
     
-    // Remove duplicates
     delete palette.themeLightBg;
     delete palette.themeLightSurface;
     delete palette.themeDarkBg;
@@ -214,6 +213,15 @@ function generateBothThemes(baseHex) {
     const light = generatePaletteWithSemantic(baseHex, 'light');
     const dark = generatePaletteWithSemantic(baseHex, 'dark');
     return { light, dark };
+}
+
+function getExampleUIColors(pal) {
+    return {
+        boxBg: currentTheme === 'light' ? pal.themeLightBg : pal.themeDarkBg,
+        surfaceBg: currentTheme === 'light' ? pal.themeLightSurface : pal.themeDarkSurface,
+        borderBg: pal.surface,
+        borderColor: pal.border
+    };
 }
 
 // State
@@ -424,6 +432,9 @@ function updateAll() {
     
     renderPalette(pal);
     
+    // Get Example UI colors based on selected variant
+    const uiColors = getExampleUIColors(pal);
+    
     const bg = pal.background;
     const surface = pal.surface;
     const text = pal.text;
@@ -432,10 +443,11 @@ function updateAll() {
     const primaryHover = pal.primaryHover;
     const border = pal.border;
 
-    previewBox.style.background = bg;
+    // Apply Example UI colors
+    previewBox.style.background = uiColors.boxBg;
     previewBox.style.color = text;
 
-    previewSurface.style.background = surface;
+    previewSurface.style.background = uiColors.surfaceBg;
     previewSurface.style.color = text;
 
     previewTitle.style.color = text;
@@ -448,9 +460,9 @@ function updateAll() {
     previewText.style.color = text;
     previewTextSecondary.style.color = textSec;
 
-    previewBorderBox.style.background = surface;
+    previewBorderBox.style.background = uiColors.borderBg;
     previewBorderBox.style.color = text;
-    previewBorderBox.style.borderColor = border;
+    previewBorderBox.style.borderColor = uiColors.borderColor;
 
     const semanticColors = generateSemanticColors(currentTheme);
     const semanticItems = previewSemantic.querySelectorAll('.semantic-item');
