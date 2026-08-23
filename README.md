@@ -6,7 +6,7 @@
 
 Core UI Palette Generator — Generate a UI color palette from a base color with Light/Dark themes, OKLCH-based color generation, semantic colors, and live UI preview.
 
-![Version](https://img.shields.io/badge/version-1.1-green.svg)
+![Version](https://img.shields.io/badge/version-1.2-green.svg)
 
 ## Features
 
