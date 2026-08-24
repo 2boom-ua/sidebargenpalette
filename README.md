@@ -21,6 +21,10 @@ Core UI Palette Generator — Generate a UI color palette from a base color with
 
 ## Installation
 
+### From Chrome Web Store or Edge Add-ons
+[![Available in Microsoft Edge Add-ons](https://img.shields.io/badge/Microsoft%20Edge%20Add--ons-Install-0078D7?logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/core-ui-palette-generator/bjhdecfkklibdgffgapobkgohkbihdka)
+
+### Manual Installation (Developer Mode)
 1. Download or clone this repository
 2. Open Chrome and go to `chrome://extensions/`
 3. Enable **Developer mode** (top right)
